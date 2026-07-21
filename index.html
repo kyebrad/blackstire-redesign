@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Black's Tire and Auto Service — Concept Redesign | Black's Has Your Back</title>
+<meta name="description" content="Concept redesign for Black's Tire and Auto Service — 60+ locations across North Carolina & South Carolina. Tires, brakes, alignment, diagnostics & commercial fleet service. Unofficial demo build showcasing an AI-enhanced experience." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='44' fill='%230a0b0d' stroke='%230e2a4a' stroke-width='6'/%3E%3Ccircle cx='50' cy='50' r='16' fill='none' stroke='%23ffb020' stroke-width='6'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+/* ══════════════════════════ RESET & TOKENS ══════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --asphalt:#0a0b0d;
+  --asphalt-2:#131519;
+  --asphalt-3:#1b1e24;
+  --border:rgba(255,255,255,.08);
+  --border-2:rgba(255,255,255,.14);
+  --text:#f2efe9;
+  --muted:#9298a2;
+  --muted-2:#5c626c;
+  --red:#1a4d8f;
+  --amber:#ffb020;
+  --heat:linear-gradient(135deg,#0e2a4a,#ffb020);
+  --cyan:#3ee6d8;
+  --radius:14px;
+  --radius-lg:20px;
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Archivo',sans-serif;
+  background:var(--asphalt);
+  color:var(--text);
+  overflow-x:hidden;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%;display:block}
+a{color:inherit}
+button{font-family:inherit;cursor:pointer}
+::selection{background:var(--red);color:#fff}
+
+.layer{position:relative;z-index:1}
+.eyebrow{
+  font-family:'Rajdhani',sans-serif;
+  font-size:13px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--red);display:flex;align-items:center;gap:10px;margin-bottom:16px;
+}
+.eyebrow::before{content:'';width:24px;height:2px;background:var(--heat);display:block}
+
+h1,h2,h3{font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:-.01em}
+.section-title{font-size:clamp(30px,4.4vw,52px);line-height:1.02;text-transform:uppercase;color:var(--text)}
+.section-title em{font-style:normal;color:transparent;background:var(--heat);-webkit-background-clip:text;background-clip:text}
+.section-sub{font-size:15px;color:var(--muted);line-height:1.75;font-weight:400;max-width:42ch}
+
+.fade-up{opacity:0;transform:translateY(28px);transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1)}
+.fade-up.visible{opacity:1;transform:translateY(0)}
+
+/* ══════════════════════════ NAV ══════════════════════════ */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  height:76px;padding:0 40px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(10,11,13,.7);backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--border);
+  transition:background .3s ease,height .3s ease;
+}
+.nav.scrolled{height:64px;background:rgba(10,11,13,.92)}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-logo-mark{width:34px;height:34px;flex-shrink:0}
+.nav-logo-text{display:flex;flex-direction:column;line-height:1}
+.nav-logo-main{font-family:'Rajdhani',sans-serif;font-size:21px;font-weight:700;letter-spacing:.02em;color:var(--text);text-transform:uppercase}
+.nav-logo-sub{font-size:9px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--muted-2)}
+.nav-links{display:flex;align-items:center;gap:34px;list-style:none}
+.nav-links a{font-size:13px;font-weight:600;letter-spacing:.04em;color:var(--muted);text-decoration:none;transition:color .2s ease;position:relative}
+.nav-links a::after{content:'';position:absolute;left:0;right:0;bottom:-6px;height:2px;background:var(--heat);transform:scaleX(0);transform-origin:left;transition:transform .25s ease}
+.nav-links a:hover{color:var(--text)}
+.nav-links a:hover::after{transform:scaleX(1)}
+.nav-cta{display:flex;align-items:center;gap:16px}
+.nav-phone{font-size:13px;font-weight:700;color:var(--text);text-decoration:none;letter-spacing:.02em}
+.nav-phone:hover{color:var(--amber)}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;padding:12px 26px;border:none;border-radius:8px;
+  font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  text-decoration:none;transition:transform .2s cubic-bezier(.16,1,.3,1),box-shadow .2s ease;position:relative;z-index:2;
+}
+.btn:active{transform:scale(.96)}
+.btn-primary{background:var(--heat);color:#0a0b0d}
+.btn-primary:hover{box-shadow:0 8px 30px rgba(14,42,74,.35);transform:translateY(-1px)}
+.btn-outline{background:transparent;color:var(--text);border:1px solid var(--border-2)}
+.btn-outline:hover{border-color:var(--amber);color:var(--amber)}
+.nav-hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;padding:6px}
+.nav-hamburger span{width:24px;height:2px;background:var(--text);transition:.3s}
+.nav-mobile{display:none;position:fixed;top:76px;left:0;right:0;z-index:199;background:rgba(10,11,13,.98);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);padding:24px 40px 32px;flex-direction:column;gap:20px}
+.nav-mobile.open{display:flex}
+.nav-mobile a{font-size:15px;font-weight:600;color:var(--muted);text-decoration:none;letter-spacing:.04em;text-transform:uppercase}
+
+/* ══════════════════════════ HERO ══════════════════════════ */
+.hero{min-height:100vh;position:relative;display:flex;align-items:center;padding:130px 40px 80px;overflow:hidden}
+#heroCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+.hero-fallback-bg{position:absolute;inset:0;z-index:0;
+  background:radial-gradient(ellipse 70% 60% at 78% 45%,rgba(14,42,74,.16) 0%,transparent 60%),
+             radial-gradient(ellipse 50% 70% at 15% 70%,rgba(255,176,32,.08) 0%,transparent 60%);
+}
+.hero-grain{position:absolute;inset:0;z-index:0;opacity:.05;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.hero-inner{position:relative;z-index:2;max-width:1280px;margin:0 auto;width:100%;display:grid;grid-template-columns:1.15fr .85fr;gap:60px;align-items:center}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:7px 16px 7px 10px;border:1px solid rgba(62,230,216,.3);border-radius:100px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan);margin-bottom:26px;background:rgba(62,230,216,.06)}
+.hero-badge-dot{width:7px;height:7px;border-radius:50%;background:var(--cyan);animation:pulse 2s ease infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+.hero-headline{font-size:clamp(42px,6.2vw,88px);line-height:.98;text-transform:uppercase;color:var(--text);margin-bottom:26px}
+.hero-headline .out{color:transparent;-webkit-text-stroke:1.5px rgba(242,239,233,.35)}
+.hero-headline em{font-style:normal;color:transparent;background:var(--heat);-webkit-background-clip:text;background-clip:text}
+.hero-sub{font-size:17px;color:var(--muted);max-width:48ch;font-weight:400;line-height:1.7;margin-bottom:40px}
+.hero-actions{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:52px}
+.hero-stat-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.hero-stat-card{background:rgba(19,21,25,.6);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;backdrop-filter:blur(10px)}
+.hsc-num{font-family:'Rajdhani',sans-serif;font-size:30px;font-weight:700;color:var(--amber);line-height:1}
+.hsc-label{font-size:12px;color:var(--muted);margin-top:4px}
+.hero-side{display:flex;flex-direction:column;gap:16px}
+.hero-side-card{background:rgba(19,21,25,.55);border:1px solid var(--border);border-radius:var(--radius-lg);padding:26px;backdrop-filter:blur(12px)}
+.hero-side-card-title{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-2);margin-bottom:12px}
+.hero-side-list{display:flex;flex-direction:column;gap:10px}
+.hero-side-item{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text)}
+.hero-side-item svg{width:16px;height:16px;stroke:var(--amber);fill:none;stroke-width:2;flex-shrink:0}
+.scroll-cue{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);z-index:2;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--muted-2);font-size:10px;letter-spacing:.18em;text-transform:uppercase}
+.scroll-cue-line{width:1px;height:36px;background:linear-gradient(180deg,var(--muted-2),transparent);animation:scrollcue 1.8s ease infinite}
+@keyframes scrollcue{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* ══════════════════════════ URGENT BAR ══════════════════════════ */
+.urgent-bar{background:linear-gradient(90deg,#0e2a4a,#0a1f38);padding:13px 40px;display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;position:relative;z-index:5}
+.urgent-text{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#fff}
+.urgent-phone{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;color:#fff;text-decoration:none;letter-spacing:.03em}
+.urgent-sep{width:1px;height:18px;background:rgba(255,255,255,.3)}
+
+/* ══════════════════════════ MARQUEE (trust bar) ══════════════════════════ */
+.marquee-section{padding:26px 0;overflow:hidden;border-bottom:1px solid var(--border)}
+.marquee-row{display:flex;white-space:nowrap;will-change:transform}
+.marquee-item{display:inline-flex;align-items:center;font-family:'Rajdhani',sans-serif;font-size:clamp(20px,3vw,32px);font-weight:700;letter-spacing:.02em;color:var(--muted);padding:0 28px;text-transform:uppercase}
+.marquee-item strong{color:var(--text)}
+.marquee-item .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--red);margin:0 28px;opacity:.7}
+
+/* ══════════════════════════ SERVICES (spotlight grid) ══════════════════════════ */
+.services-section{padding:130px 40px}
+.section-head{max-width:1200px;margin:0 auto 60px;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:24px}
+.spot-grid{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.spot-card{background:var(--asphalt-2);padding:38px 30px;position:relative;overflow:hidden;transition:background .3s ease}
+.spot-card::before{content:'';position:absolute;inset:0;background:radial-gradient(500px circle at var(--mx,50%) var(--my,50%),rgba(255,176,32,.09),transparent 45%);opacity:0;transition:opacity .35s ease;pointer-events:none}
+.spot-card:hover::before{opacity:1}
+.spot-card:hover{background:var(--asphalt-3)}
+.sc-icon{width:38px;height:38px;stroke:var(--amber);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;margin-bottom:22px}
+.sc-title{font-size:19px;font-weight:700;text-transform:uppercase;color:var(--text);margin-bottom:10px;letter-spacing:.01em}
+.sc-desc{font-size:13.5px;color:var(--muted);line-height:1.7;font-weight:400}
+
+/* ══════════════════════════ STATS (odometer + mesh) ══════════════════════════ */
+.stats-section{position:relative;padding:130px 40px;overflow:hidden}
+#meshCanvas{position:absolute;inset:0;z-index:0;opacity:.55}
+.stats-inner{position:relative;z-index:2;max-width:1100px;margin:0 auto}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;text-align:center;margin-top:56px}
+.stat-item{padding:36px 18px;background:rgba(19,21,25,.65);border:1px solid var(--border);border-radius:var(--radius-lg);backdrop-filter:blur(8px)}
+.odometer{font-family:'Rajdhani',sans-serif;font-size:clamp(34px,5vw,56px);font-weight:700;color:var(--amber);letter-spacing:-.02em;overflow:hidden;height:1.1em;display:flex;justify-content:center}
+.odo-digit{display:inline-block;overflow:hidden;height:1.1em;position:relative}
+.odo-strip{display:flex;flex-direction:column;transition:transform 1.4s cubic-bezier(.16,1,.3,1)}
+.odo-strip span{display:block;height:1.1em;line-height:1.1}
+.stat-suffix{font-family:'Rajdhani',sans-serif;font-size:clamp(24px,3.4vw,36px);font-weight:700;color:var(--amber);vertical-align:top}
+.stat-label{font-size:12.5px;color:var(--muted);margin-top:10px;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+
+/* ══════════════════════════ COMMERCIAL SPLIT ══════════════════════════ */
+.split-section{padding:0 40px 130px}
+.split-grid{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--border)}
+.split-panel{padding:56px 48px;position:relative}
+.split-panel.retail{background:var(--asphalt-2)}
+.split-panel.commercial{background:linear-gradient(160deg,#1b1305,var(--asphalt-2) 60%)}
+.split-tag{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--amber);margin-bottom:18px}
+.split-panel h3{font-size:clamp(24px,2.6vw,34px);text-transform:uppercase;margin-bottom:16px;line-height:1.05}
+.split-panel p{font-size:14.5px;color:var(--muted);line-height:1.75;margin-bottom:26px;max-width:44ch}
+.split-list{display:flex;flex-direction:column;gap:12px;margin-bottom:30px}
+.split-list-item{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--text)}
+.split-list-item svg{width:16px;height:16px;stroke:var(--amber);fill:none;stroke-width:2;flex-shrink:0}
+
+/* ══════════════════════════ LOCATIONS ══════════════════════════ */
+.locations-section{padding:0 40px 130px}
+.loc-inner{max-width:1200px;margin:0 auto}
+.loc-zip-card{background:var(--asphalt-2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px 36px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:44px}
+.loc-zip-card form{display:flex;gap:12px;flex:1;min-width:260px}
+.loc-zip-card input{flex:1;background:var(--asphalt);border:1px solid var(--border-2);border-radius:8px;padding:13px 16px;color:var(--text);font-size:14px;font-family:'Archivo',sans-serif;outline:none}
+.loc-zip-card input:focus{border-color:var(--amber)}
+.loc-result{font-size:13px;color:var(--muted);margin-top:14px;width:100%}
+.loc-result strong{color:var(--amber)}
+.loc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.loc-card{background:var(--asphalt-2);border:1px solid var(--border);border-radius:var(--radius);padding:24px 26px;transition:border-color .25s ease}
+.loc-card:hover{border-color:rgba(255,176,32,.35)}
+.loc-card-city{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:18px;text-transform:uppercase;color:var(--text);margin-bottom:4px}
+.loc-card-state{font-size:11px;color:var(--muted-2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
+.loc-card-detail{font-size:12.5px;color:var(--muted);line-height:1.6}
+
+/* ══════════════════════════ TESTIMONIALS ══════════════════════════ */
+.testi-section{padding:0 40px 130px}
+.testi-grid{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.testi-card{background:var(--asphalt-2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:34px 30px;display:flex;flex-direction:column;gap:18px;transition:border-color .3s ease}
+.testi-card:hover{border-color:rgba(255,176,32,.25)}
+.testi-stars{display:flex;gap:3px}
+.testi-stars svg{width:15px;height:15px;fill:var(--amber);stroke:none}
+.testi-quote{font-size:14.5px;color:var(--text);line-height:1.75;font-weight:400;flex:1}
+.testi-author{display:flex;align-items:center;gap:12px;padding-top:14px;border-top:1px solid var(--border)}
+.testi-avatar{width:38px;height:38px;border-radius:50%;background:rgba(255,176,32,.08);border:1px solid rgba(255,176,32,.2);display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-weight:700;color:var(--amber);font-size:15px;flex-shrink:0}
+.testi-name{font-size:13px;font-weight:700;color:var(--text)}
+.testi-loc{font-size:11px;color:var(--muted-2)}
+
+/* ══════════════════════════ BRANDS ══════════════════════════ */
+.brands-section{padding:0 40px 100px}
+.brands-inner{max-width:1200px;margin:0 auto;border:1px solid var(--border);border-radius:var(--radius-lg);padding:44px;display:flex;flex-direction:column;align-items:center;gap:32px}
+.brands-label{font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--muted-2)}
+.brands-row{display:flex;align-items:center;justify-content:center;gap:56px;flex-wrap:wrap}
+.brand-name{font-family:'Rajdhani',sans-serif;font-size:21px;font-weight:700;letter-spacing:.03em;color:rgba(242,239,233,.22);text-transform:uppercase;transition:color .3s ease}
+.brand-name:hover{color:rgba(242,239,233,.6)}
+
+/* ══════════════════════════ FAQ ══════════════════════════ */
+.faq-section{padding:0 40px 130px}
+.faq-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:360px 1fr;gap:70px;align-items:start}
+.faq-list{display:flex;flex-direction:column;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.faq-item{background:var(--asphalt-2)}
+.faq-q{width:100%;background:none;border:none;padding:22px 26px;display:flex;justify-content:space-between;align-items:center;gap:16px;text-align:left;font-family:'Archivo',sans-serif;font-size:14.5px;font-weight:600;color:var(--text)}
+.faq-q:hover{color:var(--amber)}
+.faq-q.open{color:var(--amber)}
+.faq-icon{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0;transition:transform .3s ease}
+.faq-q.open .faq-icon{transform:rotate(45deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.faq-a-inner{padding:0 26px 22px;font-size:13.5px;color:var(--muted);line-height:1.8;font-weight:400}
+
+/* ══════════════════════════ CONTACT / BOOK ══════════════════════════ */
+.contact-section{padding:0 40px 130px}
+.contact-layout{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 380px;gap:40px;align-items:start}
+.contact-form-card{background:var(--asphalt-2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:46px}
+.cf-title{font-size:24px;text-transform:uppercase;margin-bottom:30px}
+.cf-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.cf-field{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
+.cf-field label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.cf-field input,.cf-field select,.cf-field textarea{background:var(--asphalt);border:1px solid var(--border-2);border-radius:8px;padding:13px 16px;font-size:14px;font-family:'Archivo',sans-serif;color:var(--text);outline:none;transition:border-color .2s ease;width:100%}
+.cf-field input:focus,.cf-field select:focus,.cf-field textarea:focus{border-color:var(--amber)}
+.cf-field select option{background:#15171b}
+.cf-field textarea{resize:vertical;min-height:100px}
+.cf-submit{width:100%;padding:16px;font-size:12.5px;margin-top:8px}
+.contact-sidebar{display:flex;flex-direction:column;gap:18px}
+.cs-card{background:var(--asphalt-2);border:1px solid var(--border);border-radius:var(--radius);padding:26px}
+.cs-title{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--amber);margin-bottom:18px}
+.cs-row{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--muted)}
+.cs-row:last-child{border-bottom:none}
+.cs-row svg{width:16px;height:16px;stroke:var(--amber);fill:none;stroke-width:2;flex-shrink:0;margin-top:1px}
+.cs-row strong{color:var(--text);font-weight:600}
+.ht-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:12.5px}
+.ht-row:last-child{border-bottom:none}
+.ht-day{color:var(--muted)}
+.ht-time{color:var(--text);font-weight:600}
+.cf-success{display:none;text-align:center;padding:50px 10px}
+.cf-success.active{display:block}
+.cf-success h3{font-size:24px;text-transform:uppercase;margin:14px 0 8px}
+.cf-success p{font-size:13.5px;color:var(--muted)}
+
+/* ══════════════════════════ FOOTER ══════════════════════════ */
+.footer{border-top:1px solid var(--border);padding:60px 40px 30px}
+.footer-inner{max-width:1200px;margin:0 auto}
+.footer-top{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:50px;padding-bottom:44px;border-bottom:1px solid var(--border);margin-bottom:28px}
+.footer-logo{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;text-transform:uppercase;margin-bottom:10px}
+.footer-tagline{font-size:13px;color:var(--muted);margin-bottom:16px;max-width:32ch;line-height:1.6}
+.footer-license{font-size:11px;color:var(--muted-2);letter-spacing:.04em}
+.footer-col-label{font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--amber);margin-bottom:14px}
+.footer-col a{display:block;font-size:13px;color:var(--muted);text-decoration:none;margin-bottom:10px;transition:color .2s ease}
+.footer-col a:hover{color:var(--text)}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--muted-2)}
+.footer-bottom span{color:var(--amber)}
+
+/* ══════════════════════════ CHATBOT WIDGET ══════════════════════════ */
+.chat-launcher{position:fixed;bottom:26px;right:26px;z-index:400;width:62px;height:62px;border-radius:50%;background:var(--heat);border:none;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 34px rgba(14,42,74,.4);transition:transform .2s cubic-bezier(.16,1,.3,1)}
+.chat-launcher:hover{transform:scale(1.06)}
+.chat-launcher:active{transform:scale(.94)}
+.chat-launcher svg{width:26px;height:26px;stroke:#0a0b0d;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.chat-launcher .ping{position:absolute;top:-2px;right:-2px;width:14px;height:14px;border-radius:50%;background:var(--cyan);border:2px solid var(--asphalt)}
+.chat-launcher .ping::after{content:'';position:absolute;inset:0;border-radius:50%;background:var(--cyan);animation:chatping 2s ease infinite}
+@keyframes chatping{0%{transform:scale(1);opacity:.7}100%{transform:scale(2.6);opacity:0}}
+
+.chat-panel{position:fixed;bottom:100px;right:26px;z-index:400;width:392px;max-width:calc(100vw - 32px);height:600px;max-height:calc(100vh - 140px);
+  background:var(--asphalt-2);border:1px solid var(--border-2);border-radius:20px;display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:0 30px 80px rgba(0,0,0,.55);transform:scale(.95) translateY(12px);transform-origin:bottom right;opacity:0;pointer-events:none;transition:transform .22s cubic-bezier(.16,1,.3,1),opacity .22s ease}
+.chat-panel.open{transform:scale(1) translateY(0);opacity:1;pointer-events:auto}
+.chat-head{background:linear-gradient(120deg,#1a1c21,#141619);padding:18px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border)}
+.chat-avatar{width:38px;height:38px;border-radius:50%;background:var(--heat);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Rajdhani',sans-serif;font-weight:700;color:#0a0b0d;font-size:15px}
+.chat-head-text{flex:1}
+.chat-head-name{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;text-transform:uppercase}
+.chat-head-status{font-size:11px;color:var(--cyan);display:flex;align-items:center;gap:6px}
+.chat-head-status::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--cyan)}
+.chat-close{background:none;border:none;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:background .2s ease}
+.chat-close:hover{background:rgba(255,255,255,.08)}
+.chat-close svg{width:18px;height:18px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round}
+
+.chat-body{flex:1;overflow-y:auto;padding:18px 16px;display:flex;flex-direction:column;gap:12px;scrollbar-width:thin}
+.chat-body::-webkit-scrollbar{width:5px}
+.chat-body::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:4px}
+.msg{max-width:84%;padding:11px 15px;border-radius:14px;font-size:13.5px;line-height:1.55;animation:msgin .25s cubic-bezier(.16,1,.3,1)}
+@keyframes msgin{from{opacity:0;transform:translateY(6px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+.msg.bot{background:var(--asphalt-3);color:var(--text);align-self:flex-start;border-bottom-left-radius:4px}
+.msg.user{background:var(--heat);color:#0a0b0d;align-self:flex-end;border-bottom-right-radius:4px;font-weight:600}
+.msg-chips{display:flex;flex-wrap:wrap;gap:8px;align-self:flex-start;max-width:100%}
+.chip{background:var(--asphalt-3);border:1px solid var(--border-2);color:var(--text);font-size:12.5px;font-weight:600;padding:9px 15px;border-radius:100px;transition:border-color .2s ease,color .2s ease}
+.chip:hover{border-color:var(--amber);color:var(--amber)}
+.chip.chip-accent{border-color:rgba(14,42,74,.4);color:var(--amber)}
+.typing{align-self:flex-start;display:flex;gap:4px;padding:12px 15px;background:var(--asphalt-3);border-radius:14px;border-bottom-left-radius:4px}
+.typing span{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:typingdot 1.2s ease infinite}
+.typing span:nth-child(2){animation-delay:.15s}
+.typing span:nth-child(3){animation-delay:.3s}
+@keyframes typingdot{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+
+.chat-input-row{display:flex;gap:8px;padding:14px 14px 16px;border-top:1px solid var(--border)}
+.chat-input-row input{flex:1;background:var(--asphalt);border:1px solid var(--border-2);border-radius:100px;padding:11px 17px;color:var(--text);font-size:13.5px;font-family:'Archivo',sans-serif;outline:none}
+.chat-input-row input:focus{border-color:var(--amber)}
+.chat-send{width:40px;height:40px;border-radius:50%;background:var(--heat);border:none;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.chat-send svg{width:17px;height:17px;stroke:#0a0b0d;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.chat-footnote{font-size:10px;color:var(--muted-2);text-align:center;padding:0 16px 12px}
+
+/* ── Voice call demo modal ── */
+.call-overlay{position:fixed;inset:0;z-index:500;background:rgba(6,7,8,.82);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s ease}
+.call-overlay.open{opacity:1;pointer-events:auto}
+.call-card{width:380px;max-width:calc(100vw - 40px);background:linear-gradient(160deg,#181a1f,#101215);border:1px solid var(--border-2);border-radius:24px;padding:34px 28px 26px;transform:scale(.94);transition:transform .25s cubic-bezier(.16,1,.3,1)}
+.call-overlay.open .call-card{transform:scale(1)}
+.call-phone-icon{width:64px;height:64px;border-radius:50%;background:var(--heat);display:flex;align-items:center;justify-content:center;margin:0 auto 18px}
+.call-phone-icon svg{width:26px;height:26px;stroke:#0a0b0d;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.call-phone-icon.dialing{animation:dialpulse 1s ease infinite}
+@keyframes dialpulse{0%,100%{box-shadow:0 0 0 0 rgba(14,42,74,.5)}50%{box-shadow:0 0 0 14px rgba(14,42,74,0)}}
+.call-status{text-align:center;font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;text-transform:uppercase;margin-bottom:4px}
+.call-sub{text-align:center;font-size:12px;color:var(--muted-2);margin-bottom:22px}
+.call-transcript{background:var(--asphalt);border:1px solid var(--border);border-radius:14px;padding:16px;height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.call-line{font-size:12.5px;line-height:1.55;animation:msgin .3s ease}
+.call-line b{color:var(--amber)}
+.call-hangup{width:100%;background:#0e2a4a;color:#fff;border:none;border-radius:100px;padding:13px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:8px}
+.call-hangup:hover{background:#0a1f38}
+.call-note{font-size:10.5px;color:var(--muted-2);text-align:center;margin-top:14px;line-height:1.6}
+
+/* particle/confetti fx (shared) */
+.particle{position:fixed;width:8px;height:8px;border-radius:50%;pointer-events:none;z-index:9999}
+
+/* ══════════════════════════ RESPONSIVE ══════════════════════════ */
+@media (max-width:1080px){
+  .hero-inner{grid-template-columns:1fr}
+  .spot-grid{grid-template-columns:1fr 1fr}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .split-grid{grid-template-columns:1fr}
+  .loc-grid{grid-template-columns:1fr 1fr}
+  .testi-grid{grid-template-columns:1fr 1fr}
+  .faq-inner{grid-template-columns:1fr;gap:36px}
+  .contact-layout{grid-template-columns:1fr}
+  .footer-top{grid-template-columns:1fr 1fr;gap:32px}
+}
+@media (max-width:720px){
+  .nav{padding:0 20px}
+  .nav-links,.nav-phone{display:none}
+  .nav-hamburger{display:flex}
+  .hero{padding:110px 20px 60px}
+  .urgent-bar,.services-section,.stats-section,.split-section,.locations-section,.testi-section,.brands-section,.faq-section,.contact-section,.footer{padding-left:20px;padding-right:20px}
+  .spot-grid,.loc-grid,.testi-grid{grid-template-columns:1fr}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .cf-row{grid-template-columns:1fr}
+  .footer-top{grid-template-columns:1fr}
+  .chat-panel{right:16px;bottom:90px;width:calc(100vw - 32px)}
+  .chat-launcher{right:16px;bottom:16px}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════ NAV ══════════════════════════ -->
+<nav class="nav" id="nav">
+  <a href="#top" class="nav-logo">
+    <svg class="nav-logo-mark" viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="none" stroke="#1a4d8f" stroke-width="7"/><circle cx="50" cy="50" r="17" fill="none" stroke="#ffb020" stroke-width="7"/><line x1="50" y1="6" x2="50" y2="24" stroke="#f2efe9" stroke-width="4"/><line x1="50" y1="76" x2="50" y2="94" stroke="#f2efe9" stroke-width="4"/><line x1="6" y1="50" x2="24" y2="50" stroke="#f2efe9" stroke-width="4"/><line x1="76" y1="50" x2="94" y2="50" stroke="#f2efe9" stroke-width="4"/></svg>
+    <span class="nav-logo-text"><span class="nav-logo-main">Black's Tire</span><span class="nav-logo-sub">&amp; Auto Service</span></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#services">Tires &amp; Automotive</a></li>
+    <li><a href="#commercial">Commercial</a></li>
+    <li><a href="#locations">Locations</a></li>
+    <li><a href="#reviews">Reviews</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="nav-cta">
+    <a href="tel:+18435550187" class="nav-phone">(843) 555-0187</a>
+    <a href="#contact" class="btn btn-primary">Schedule Appointment</a>
+  </div>
+  <button class="nav-hamburger" id="hamburger" aria-label="Open menu"><span></span><span></span><span></span></button>
+</nav>
+<div class="nav-mobile" id="navMobile">
+  <a href="#services">Tires &amp; Automotive</a>
+  <a href="#commercial">Commercial</a>
+  <a href="#locations">Locations</a>
+  <a href="#reviews">Reviews</a>
+  <a href="#contact">Contact</a>
+  <a href="tel:+18435550187">(843) 555-0187</a>
+</div>
+
+<!-- ══════════════════════════ HERO ══════════════════════════ -->
+<header class="hero" id="top">
+  <canvas id="heroCanvas"></canvas>
+  <div class="hero-fallback-bg"></div>
+  <div class="hero-grain"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="hero-badge"><span class="hero-badge-dot"></span> Concept Redesign — AI Service Advisor Preview</div>
+      <h1 class="hero-headline"><span class="out">Black's Has</span> <em>Your Back</em><br>North &amp; South<br>Carolina</h1>
+      <p class="hero-sub">60+ locations across North Carolina &amp; South Carolina. Tires, brakes, alignments, engine diagnostics, and full commercial fleet service — trusted by generations of Carolina drivers.</p>
+      <div class="hero-actions">
+        <button class="btn btn-primary explode-btn" data-type="particles" data-color="#ffb020" id="heroBookBtn">Book Your Appointment</button>
+        <a href="tel:+18435550187" class="btn btn-outline">Call (843) 555-0187</a>
+      </div>
+      <div class="hero-stat-row">
+        <div class="hero-stat-card"><div class="hsc-num">60+</div><div class="hsc-label">Locations, NC &amp; SC</div></div>
+        <div class="hero-stat-card"><div class="hsc-num">24/7</div><div class="hsc-label">Roadside Assistance</div></div>
+      </div>
+    </div>
+    <div class="hero-side">
+      <div class="hero-side-card">
+        <div class="hero-side-card-title">Why Drivers Choose Black's</div>
+        <div class="hero-side-list">
+          <div class="hero-side-item"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> Top brands: Goodyear, Michelin, Cooper &amp; more</div>
+          <div class="hero-side-item"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> Year/make/model tire finder</div>
+          <div class="hero-side-item"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> Wheel visualizer for custom looks</div>
+          <div class="hero-side-item"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> Commercial &amp; fleet accounts</div>
+        </div>
+      </div>
+      <div class="hero-side-card">
+        <div class="hero-side-card-title">Ask REV Right Now</div>
+        <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:14px">This concept build adds an AI service advisor that can walk a customer through booking, answer common questions, or take a call — no hold music required.</p>
+        <button class="btn btn-outline" style="width:100%;justify-content:center" onclick="openChat()">Open Chat with REV →</button>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-cue"><span>Scroll</span><span class="scroll-cue-line"></span></div>
+</header>
+
+<!-- ══════════════════════════ URGENT BAR ══════════════════════════ -->
+<div class="urgent-bar">
+  <span class="urgent-text">🔧 Flat tire or breakdown?</span>
+  <span class="urgent-sep"></span>
+  <a href="tel:+18435550187" class="urgent-phone">24-Hour Roadside Assistance — (843) 555-0187</a>
+</div>
+
+<!-- ══════════════════════════ TRUST MARQUEE ══════════════════════════ -->
+<section class="marquee-section">
+  <div class="marquee-row" data-speed="1" data-direction="left">
+    <div class="marquee-content">
+      <span class="marquee-item"><strong>60+ Locations</strong> NC &amp; SC<span class="dot"></span></span>
+      <span class="marquee-item"><strong>"Black's Has Your Back"</strong><span class="dot"></span></span>
+      <span class="marquee-item"><strong>8 Major Brands</strong> Goodyear · Michelin · Cooper<span class="dot"></span></span>
+      <span class="marquee-item"><strong>24-Hour</strong> Roadside Assistance<span class="dot"></span></span>
+      <span class="marquee-item"><strong>Commercial</strong> Fleet Services<span class="dot"></span></span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ SERVICES ══════════════════════════ -->
+<section class="services-section" id="services">
+  <div class="section-head layer fade-up">
+    <div>
+      <div class="eyebrow">What We Do</div>
+      <h2 class="section-title">Full-Service <em>Tire &amp; Auto</em> Care</h2>
+    </div>
+    <p class="section-sub">From a single tire swap to a full fleet contract — one standard of work, 60+ shops across the Carolinas.</p>
+  </div>
+  <div class="spot-grid" id="spotGrid">
+    <div class="spot-card fade-up">
+      <svg class="sc-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M21 12h-3M6 12H3"/></svg>
+      <div class="sc-title">Tires &amp; Wheels</div>
+      <div class="sc-desc">Drop in your year, make &amp; model to match compatible tires instantly, plus a wheel visualizer to try on custom looks before you buy.</div>
+    </div>
+    <div class="spot-card fade-up">
+      <svg class="sc-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.4"/><path d="M12 4v4M12 16v4M4 12h4M16 12h4M6.3 6.3l2.8 2.8M14.9 14.9l2.8 2.8M17.7 6.3l-2.8 2.8M9.1 14.9l-2.8 2.8"/></svg>
+      <div class="sc-title">Brake Repair &amp; Replacement</div>
+      <div class="sc-desc">Pads, rotors, calipers, and full brake system diagnostics from trained technicians.</div>
+    </div>
+    <div class="spot-card fade-up">
+      <svg class="sc-icon" viewBox="0 0 24 24"><path d="M12 2s6 7 6 12a6 6 0 0 1-12 0c0-5 6-12 6-12z"/></svg>
+      <div class="sc-title">Fluid Inspection</div>
+      <div class="sc-desc">Oil, coolant, transmission, and brake fluid checked and topped off as part of routine maintenance.</div>
+    </div>
+    <div class="spot-card fade-up">
+      <svg class="sc-icon" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      <div class="sc-title">Wheel Alignments</div>
+      <div class="sc-desc">Precision alignment service to protect tire life, improve handling, and keep your ride smooth.</div>
+    </div>
+    <div class="spot-card fade-up">
+      <svg class="sc-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <div class="sc-title">Engine Diagnostics</div>
+      <div class="sc-desc">Check-engine light or performance issue? Our techs pinpoint the cause before recommending a fix.</div>
+    </div>
+    <div class="spot-card fade-up">
+      <svg class="sc-icon" viewBox="0 0 24 24"><path d="M3 17h13v-5H3zM16 12h4l3 4v1h-7z"/><circle cx="7.5" cy="19" r="2"/><circle cx="17.5" cy="19" r="2"/></svg>
+      <div class="sc-title">Batteries</div>
+      <div class="sc-desc">Free battery testing with replacement and installation on the spot, most makes and models.</div>
+    </div>
+    <div class="spot-card fade-up">
+      <svg class="sc-icon" viewBox="0 0 24 24"><path d="M3 21V8l6-4 6 4v13"/><path d="M15 21V11l6-3v13"/><path d="M9 9h.01M9 13h.01M9 17h.01"/></svg>
+      <div class="sc-title">Maintenance</div>
+      <div class="sc-desc">Scheduled maintenance to keep every vehicle running reliably, mile after mile.</div>
+    </div>
+    <div class="spot-card fade-up">
+      <svg class="sc-icon" viewBox="0 0 24 24"><rect x="3" y="10" width="18" height="10" rx="1"/><path d="M7 10V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v4M3 15h18"/></svg>
+      <div class="sc-title">Commercial Services</div>
+      <div class="sc-desc">Dedicated commercial and fleet accounts with volume pricing and priority scheduling.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ STATS ══════════════════════════ -->
+<section class="stats-section">
+  <canvas id="meshCanvas"></canvas>
+  <div class="stats-inner">
+    <div class="section-head fade-up" style="margin-bottom:0">
+      <div>
+        <div class="eyebrow">By The Numbers</div>
+        <h2 class="section-title">One Standard, <em>Every Carolina Shop</em></h2>
+      </div>
+      <p class="section-sub">The same trusted service, whether you're in the mountains or on the coast.</p>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-item fade-up"><div class="odometer" data-value="60" data-suffix="+"></div><div class="stat-label">Locations, NC &amp; SC</div></div>
+      <div class="stat-item fade-up"><div class="odometer" data-value="8"></div><div class="stat-label">Major Tire Brands Carried</div></div>
+      <div class="stat-item fade-up"><div class="odometer" data-value="24" data-suffix="/7"></div><div class="stat-label">Roadside Assistance</div></div>
+      <div class="stat-item fade-up"><div class="odometer" data-value="7"></div><div class="stat-label">Core Service Categories</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ COMMERCIAL SPLIT ══════════════════════════ -->
+<section class="split-section" id="commercial">
+  <div class="section-head layer fade-up">
+    <div>
+      <div class="eyebrow">Retail + Commercial</div>
+      <h2 class="section-title">One Shop Floor. <em>Two Ways</em> to Work With Us.</h2>
+    </div>
+  </div>
+  <div class="split-grid fade-up">
+    <div class="split-panel retail">
+      <div class="split-tag">For Drivers</div>
+      <h3>Automotive &amp; Walk-In Service</h3>
+      <p>Book online, drop in, or call — most tire, brake, and maintenance work is completed same-day across our NC &amp; SC locations.</p>
+      <div class="split-list">
+        <div class="split-list-item"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> Online booking in under 2 minutes</div>
+        <div class="split-list-item"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> Year/make/model tire &amp; wheel finder</div>
+        <div class="split-list-item"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> Financing options available at checkout</div>
+      </div>
+      <button class="btn btn-primary" onclick="openChat();startBookingFlow();">Book an Appointment</button>
+    </div>
+    <div class="split-panel commercial">
+      <div class="split-tag">For Businesses</div>
+      <h3>Commercial &amp; Fleet Services</h3>
+      <p>Volume tire programs and priority-scheduled fleet maintenance for businesses across the Carolinas.</p>
+      <div class="split-list">
+        <div class="split-list-item"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> Dedicated account support</div>
+        <div class="split-list-item"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> Volume pricing for fleets</div>
+        <div class="split-list-item"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> Priority scheduling at any location</div>
+      </div>
+      <a href="#contact" class="btn btn-outline">Talk to a Fleet Specialist</a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ LOCATIONS ══════════════════════════ -->
+<section class="locations-section" id="locations">
+  <div class="loc-inner">
+    <div class="section-head fade-up">
+      <div>
+        <div class="eyebrow">Find Us</div>
+        <h2 class="section-title">60+ Shops. <em>Two</em> States.</h2>
+      </div>
+      <p class="section-sub">From the Grand Strand to the Piedmont — a Black's Tire shop is never far. (Sample of real locations shown below.)</p>
+    </div>
+    <div class="loc-zip-card fade-up">
+      <form id="zipForm" onsubmit="return handleZipLookup(event)">
+        <input type="text" id="zipInput" placeholder="Enter your ZIP code to find the nearest shop" maxlength="5" inputmode="numeric" />
+        <button type="submit" class="btn btn-primary">Find Shop</button>
+      </form>
+      <div class="loc-result" id="zipResult"></div>
+    </div>
+    <div class="loc-grid">
+      <div class="loc-card fade-up"><div class="loc-card-city">Myrtle Beach</div><div class="loc-card-state">South Carolina</div><div class="loc-card-detail">709 Seaboard St.</div></div>
+      <div class="loc-card fade-up"><div class="loc-card-city">North Myrtle Beach</div><div class="loc-card-state">South Carolina</div><div class="loc-card-detail">2415 Highway 17 South</div></div>
+      <div class="loc-card fade-up"><div class="loc-card-city">Conway</div><div class="loc-card-state">South Carolina</div><div class="loc-card-detail">1501 Third Avenue</div></div>
+      <div class="loc-card fade-up"><div class="loc-card-city">Longs</div><div class="loc-card-state">South Carolina</div><div class="loc-card-detail">1507 Hwy 9 East</div></div>
+      <div class="loc-card fade-up"><div class="loc-card-city">Pawleys Island</div><div class="loc-card-state">South Carolina</div><div class="loc-card-detail">9571 Hwy. 17</div></div>
+      <div class="loc-card fade-up"><div class="loc-card-city">Georgetown</div><div class="loc-card-state">South Carolina</div><div class="loc-card-detail">310 S Fraser St.</div></div>
+      <div class="loc-card fade-up"><div class="loc-card-city">Fayetteville</div><div class="loc-card-state">North Carolina</div><div class="loc-card-detail">2007 Skibo Rd. · one of 8 area shops</div></div>
+      <div class="loc-card fade-up"><div class="loc-card-city">Wilmington</div><div class="loc-card-state">North Carolina</div><div class="loc-card-detail">2828 Carolina Beach Road</div></div>
+      <div class="loc-card fade-up"><div class="loc-card-city">Raleigh</div><div class="loc-card-state">North Carolina</div><div class="loc-card-detail">4201 Capital Blvd.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ TESTIMONIALS ══════════════════════════ -->
+<section class="testi-section" id="reviews">
+  <div class="section-head fade-up" style="max-width:1200px;margin:0 auto 60px">
+    <div>
+      <div class="eyebrow">Real Reviews</div>
+      <h2 class="section-title">What Customers <em>Actually Say</em></h2>
+    </div>
+    <p class="section-sub">Pulled from Black's Tire and Auto Service's own site — shown here as-is, including their truncation.</p>
+  </div>
+  <div class="testi-grid">
+    <div class="testi-card fade-up">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-quote">"Customer service is outstanding. Tyler explained everything that was going on with my car. Kept me up to date on when my car would be ready. I will be…"</p>
+      <div class="testi-author"><div class="testi-avatar">M</div><div><div class="testi-name">Michelle</div><div class="testi-loc">Verified customer review</div></div></div>
+    </div>
+    <div class="testi-card fade-up">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-quote">"Can not say enough about the service this Black's Tire helped my youngest daughter. She went there with a potential oil leak. I asked her to go and ge…"</p>
+      <div class="testi-author"><div class="testi-avatar">B</div><div><div class="testi-name">Bryan DuChane</div><div class="testi-loc">Verified customer review</div></div></div>
+    </div>
+    <div class="testi-card fade-up">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-quote">"Kyle and his crew are EXCEPTIONAL people. Every experience I've ever had with them has been absolutely phenomenal. We recently moved five hours away…"</p>
+      <div class="testi-author"><div class="testi-avatar">J</div><div><div class="testi-name">Jade Leming</div><div class="testi-loc">Verified customer review</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ BRANDS ══════════════════════════ -->
+<section class="brands-section">
+  <div class="brands-inner fade-up">
+    <div class="brands-label">Tire Brands We Carry</div>
+    <div class="brands-row">
+      <span class="brand-name">Goodyear</span>
+      <span class="brand-name">Michelin</span>
+      <span class="brand-name">Cooper</span>
+      <span class="brand-name">Continental</span>
+      <span class="brand-name">Kelly</span>
+      <span class="brand-name">Hankook</span>
+      <span class="brand-name">BFGoodrich</span>
+      <span class="brand-name">Dunlop</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ FAQ ══════════════════════════ -->
+<section class="faq-section">
+  <div class="faq-inner">
+    <div class="fade-up">
+      <div class="eyebrow">FAQ</div>
+      <h2 class="section-title" style="margin-bottom:16px">Common <em>Questions</em></h2>
+      <p style="font-size:14px;color:var(--muted);line-height:1.75;font-weight:400">Can't find your answer? REV — our AI service advisor — is online 24/7 in the bottom-right corner.</p>
+    </div>
+    <div class="faq-list fade-up" id="faqList">
+      <div class="faq-item"><button class="faq-q">Do I need an appointment?<svg class="faq-icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button><div class="faq-a"><div class="faq-a-inner">Walk-ins are always welcome, but booking ahead (online or through REV) guarantees your bay time and usually gets you in faster.</div></div></div>
+      <div class="faq-item"><button class="faq-q">Which tire brands do you carry?<svg class="faq-icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button><div class="faq-a"><div class="faq-a-inner">Goodyear, Michelin, Cooper, Continental, Kelly, Hankook, BFGoodrich, and Dunlop, across every budget tier.</div></div></div>
+      <div class="faq-item"><button class="faq-q">Do you service commercial fleets?<svg class="faq-icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button><div class="faq-a"><div class="faq-a-inner">Yes — dedicated fleet accounts get volume pricing, a named account manager, priority scheduling, and on-site or mobile service for qualifying fleet sizes.</div></div></div>
+      <div class="faq-item"><button class="faq-q">What are your hours?<svg class="faq-icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button><div class="faq-a"><div class="faq-a-inner">Monday–Friday 7:30am–6pm, Saturday 8am–4pm, closed Sunday. Roadside dispatch runs 24/7, every day of the year.</div></div></div>
+      <div class="faq-item"><button class="faq-q">Can I try different wheels before I buy?<svg class="faq-icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button><div class="faq-a"><div class="faq-a-inner">Yes — our wheel visualizer lets you preview different wheel styles on your exact vehicle before you commit.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ CONTACT / BOOK ══════════════════════════ -->
+<section class="contact-section" id="contact">
+  <div class="section-head fade-up" style="max-width:1200px;margin:0 auto 44px">
+    <div>
+      <div class="eyebrow">Book Now</div>
+      <h2 class="section-title">Get on the <em>Schedule</em></h2>
+    </div>
+    <p class="section-sub">Prefer to talk it through? REV can book this same appointment in the chat widget, or take your call directly.</p>
+  </div>
+  <div class="contact-layout">
+    <div class="contact-form-card fade-up">
+      <div class="cf-title">Request an Appointment</div>
+      <form id="bookForm" onsubmit="return handleBookSubmit(event)">
+        <div class="cf-row">
+          <div class="cf-field"><label>First Name</label><input type="text" required /></div>
+          <div class="cf-field"><label>Last Name</label><input type="text" required /></div>
+        </div>
+        <div class="cf-row">
+          <div class="cf-field"><label>Phone</label><input type="tel" required /></div>
+          <div class="cf-field"><label>Preferred Location</label>
+            <select><option>North Myrtle Beach, SC</option><option>Myrtle Beach, SC</option><option>Surfside Beach, SC</option><option>Conway, SC</option><option>Pawleys Island, SC</option><option>Georgetown, SC</option><option>Shallotte, NC</option><option>Calabash, NC</option><option>Wilmington, NC</option></select>
+          </div>
+        </div>
+        <div class="cf-field"><label>Service Needed</label>
+          <select><option>Tires &amp; Wheels</option><option>Brake Repair &amp; Replacement</option><option>Fluid Inspection</option><option>Wheel Alignments</option><option>Engine Diagnostics</option><option>Batteries</option><option>Commercial / Fleet</option><option>Not Sure — Just Diagnose It</option></select>
+        </div>
+        <div class="cf-field"><label>Anything else we should know?</label><textarea placeholder="Tell us about the issue, or your vehicle's year/make/model"></textarea></div>
+        <button type="submit" class="btn btn-primary cf-submit explode-btn" data-type="ring" data-color="#ffb020">Request Appointment</button>
+      </form>
+      <div class="cf-success" id="cfSuccess">
+        <div style="width:56px;height:56px;border-radius:50%;border:2px solid var(--amber);margin:0 auto 18px;display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" stroke="#ffb020" fill="none" stroke-width="2" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+        <h3>Request Received</h3>
+        <p>A team member will confirm your appointment shortly. Want it locked in right now instead? Chat with REV — bottom right.</p>
+      </div>
+    </div>
+    <div class="contact-sidebar fade-up">
+      <div class="cs-card">
+        <div class="cs-title">Contact</div>
+        <div class="cs-row"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span><strong>(843) 555-0187</strong><br>24/7 roadside line</span></div>
+        <div class="cs-row"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></svg><span>hello@redlinetireco.com</span></div>
+        <div class="cs-row"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span>60+ locations across NC &amp; SC — see sample above</span></div>
+      </div>
+      <div class="cs-card">
+        <div class="cs-title">Shop Hours</div>
+        <div class="ht-row"><span class="ht-day">Mon – Fri</span><span class="ht-time">7:30am – 6:00pm</span></div>
+        <div class="ht-row"><span class="ht-day">Saturday</span><span class="ht-time">8:00am – 4:00pm</span></div>
+        <div class="ht-row"><span class="ht-day">Sunday</span><span class="ht-time">Closed</span></div>
+        <div class="ht-row"><span class="ht-day">Roadside Dispatch</span><span class="ht-time" style="color:var(--amber)">24 / 7 / 365</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ FOOTER ══════════════════════════ -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <div class="footer-logo">Black's Tire and Auto Service</div>
+        <p class="footer-tagline">"Black's Has Your Back" — 60+ locations across North Carolina &amp; South Carolina.</p>
+        <div class="footer-license">Unofficial concept redesign — not affiliated with or endorsed by Black's Tire and Auto Service. Built as a demo by KB Creative AI Studio.</div>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-label">Company</div>
+        <a href="#services">Services</a>
+        <a href="#commercial">Commercial</a>
+        <a href="#locations">Locations</a>
+        <a href="#reviews">Reviews</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-label">Support</div>
+        <a href="#contact">Book an Appointment</a>
+        <a href="tel:+18435550187">24/7 Roadside</a>
+        <a href="javascript:openChat()">Chat with REV</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-label">Connect</div>
+        <a href="#">Instagram</a>
+        <a href="#">Facebook</a>
+        <a href="#">Google Reviews</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Black's Tire and Auto Service — unofficial fan-built concept redesign. Real business, demo site.</span>
+      <span>Design &amp; build by <span>KB Creative AI Studio</span></span>
+    </div>
+  </div>
+</footer>
+
+<!-- ══════════════════════════ CHATBOT WIDGET ══════════════════════════ -->
+<button class="chat-launcher" id="chatLauncher" onclick="toggleChat()" aria-label="Open AI chat assistant">
+  <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+  <span class="ping"></span>
+</button>
+
+<div class="chat-panel" id="chatPanel">
+  <div class="chat-head">
+    <div class="chat-avatar">R</div>
+    <div class="chat-head-text">
+      <div class="chat-head-name">REV — AI Service Advisor</div>
+      <div class="chat-head-status">Online now</div>
+    </div>
+    <button class="chat-close" onclick="toggleChat()" aria-label="Close chat"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+  </div>
+  <div class="chat-body" id="chatBody"></div>
+  <div class="chat-input-row">
+    <input type="text" id="chatInput" placeholder="Ask REV anything…" onkeydown="if(event.key==='Enter')sendChat()" />
+    <button class="chat-send" onclick="sendChat()" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
+  </div>
+  <div class="chat-footnote">Demo assistant · booking &amp; FAQ logic run locally · connects to Cal.com + ElevenLabs in production</div>
+</div>
+
+<!-- ══════════════════════════ VOICE CALL DEMO MODAL ══════════════════════════ -->
+<div class="call-overlay" id="callOverlay">
+  <div class="call-card">
+    <div class="call-phone-icon dialing" id="callIcon">
+      <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+    </div>
+    <div class="call-status" id="callStatus">Dialing REV AI Line…</div>
+    <div class="call-sub" id="callSub">(843) 555-0187 · Demo Voice Preview</div>
+    <div class="call-transcript" id="callTranscript"></div>
+    <button class="call-hangup" onclick="endCallDemo()">Hang Up</button>
+    <div class="call-note">This is a demo of REV's live phone-call capability. In production, this number rings a real ElevenLabs Conversational AI agent over Twilio, sharing the same booking &amp; FAQ logic shown in this chat.</div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   NAV BEHAVIOR
+   ══════════════════════════════════════════════════════════════ */
+(function(){
+  var nav=document.getElementById('nav');
+  window.addEventListener('scroll',function(){
+    nav.classList.toggle('scrolled',window.scrollY>40);
+  });
+  var burger=document.getElementById('hamburger');
+  var mobile=document.getElementById('navMobile');
+  burger.addEventListener('click',function(){mobile.classList.toggle('open')});
+  mobile.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){mobile.classList.remove('open')})});
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   SCROLL FADE-IN
+   ══════════════════════════════════════════════════════════════ */
+(function(){
+  var els=document.querySelectorAll('.fade-up');
+  var obs=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); } });
+  },{threshold:.15});
+  els.forEach(function(el){obs.observe(el)});
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   3D HERO — Three.js rotating wheel
+   ══════════════════════════════════════════════════════════════ */
+(function(){
+  var canvas=document.getElementById('heroCanvas');
+  var reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(typeof THREE==='undefined'){canvas.style.display='none';return;}
+  try{
+    var renderer=new THREE.WebGLRenderer({canvas:canvas,alpha:true,antialias:true});
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+    var scene=new THREE.Scene();
+    var camera=new THREE.PerspectiveCamera(38,window.innerWidth/window.innerHeight,0.1,100);
+    camera.position.set(0,0,9);
+
+    var wheel=new THREE.Group();
+
+    // Tire (dark rubber torus)
+    var tireGeo=new THREE.TorusGeometry(2.6,0.85,32,64);
+    var tireMat=new THREE.MeshStandardMaterial({color:0x0d0e10,roughness:0.92,metalness:0.05});
+    var tire=new THREE.Mesh(tireGeo,tireMat);
+    wheel.add(tire);
+
+    // Rim (metallic ring)
+    var rimGeo=new THREE.TorusGeometry(1.55,0.22,24,48);
+    var rimMat=new THREE.MeshStandardMaterial({color:0xd7d2c8,roughness:0.25,metalness:0.9});
+    var rim=new THREE.Mesh(rimGeo,rimMat);
+    wheel.add(rim);
+
+    // Hub
+    var hubGeo=new THREE.CylinderGeometry(0.42,0.42,0.5,24);
+    var hubMat=new THREE.MeshStandardMaterial({color:0xffb020,roughness:0.35,metalness:0.7,emissive:0x442200,emissiveIntensity:0.4});
+    var hub=new THREE.Mesh(hubGeo,hubMat);
+    hub.rotation.x=Math.PI/2;
+    wheel.add(hub);
+
+    // Spokes
+    var spokeMat=new THREE.MeshStandardMaterial({color:0xc9c4ba,roughness:0.3,metalness:0.85});
+    for(var i=0;i<7;i++){
+      var spokeGeo=new THREE.BoxGeometry(0.16,1.35,0.16);
+      var spoke=new THREE.Mesh(spokeGeo,spokeMat);
+      var ang=(i/7)*Math.PI*2;
+      spoke.position.set(Math.cos(ang)*0.95,Math.sin(ang)*0.95,0);
+      spoke.rotation.z=ang;
+      wheel.add(spoke);
+    }
+
+    wheel.rotation.x=0.15;
+    scene.add(wheel);
+
+    var ambient=new THREE.AmbientLight(0x40454c,1.1);
+    scene.add(ambient);
+    var heatLight=new THREE.PointLight(0x1a4d8f,3.2,20);
+    heatLight.position.set(4,1.5,4);
+    scene.add(heatLight);
+    var coolLight=new THREE.PointLight(0x4fd8e8,1.4,20);
+    coolLight.position.set(-4,-2,3);
+    scene.add(coolLight);
+    var rimGlow=new THREE.PointLight(0xffb020,1.8,10);
+    rimGlow.position.set(0,0,3);
+    scene.add(rimGlow);
+
+    function resize(){
+      var w=window.innerWidth,h=window.innerHeight;
+      renderer.setSize(w,h);
+      camera.aspect=w/h;
+      camera.updateProjectionMatrix();
+    }
+    resize();
+    window.addEventListener('resize',resize);
+
+    var mouseX=0,mouseY=0,targetX=0,targetY=0;
+    window.addEventListener('mousemove',function(e){
+      mouseX=(e.clientX/window.innerWidth-0.5)*2;
+      mouseY=(e.clientY/window.innerHeight-0.5)*2;
+    });
+
+    if(reduced){
+      wheel.rotation.y=0.6;
+      renderer.render(scene,camera);
+    }else{
+      (function animate(){
+        requestAnimationFrame(animate);
+        wheel.rotation.y+=0.006;
+        targetX+=(mouseY*0.18-targetX)*0.04;
+        targetY+=(mouseX*0.28-targetY)*0.04;
+        wheel.rotation.x=0.15+targetX;
+        camera.position.x+=(targetY*1.2-camera.position.x)*0.05;
+        camera.lookAt(0,0,0);
+        renderer.render(scene,camera);
+      })();
+    }
+  }catch(err){
+    canvas.style.display='none';
+    console.warn('3D hero unavailable, using fallback gradient:',err);
+  }
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   MESH GRADIENT — stats section ambience
+   ══════════════════════════════════════════════════════════════ */
+(function(){
+  var canvas=document.getElementById('meshCanvas');
+  var ctx=canvas.getContext('2d');
+  var colors=['rgba(14,42,74,.16)','rgba(255,176,32,.14)','rgba(62,230,216,.09)','rgba(120,60,20,.12)'];
+  var blobs=colors.map(function(c){return{x:Math.random(),y:Math.random(),vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35,r:.32+Math.random()*.18,color:c};});
+  function resize(){canvas.width=canvas.offsetWidth*1.5;canvas.height=canvas.offsetHeight*1.5;}
+  resize();window.addEventListener('resize',resize);
+  function draw(){
+    var w=canvas.width,h=canvas.height;
+    ctx.fillStyle='#0a0b0d';ctx.fillRect(0,0,w,h);
+    blobs.forEach(function(b){
+      b.x+=b.vx/w*40;b.y+=b.vy/h*40;
+      if(b.x<-.2||b.x>1.2)b.vx*=-1;
+      if(b.y<-.2||b.y>1.2)b.vy*=-1;
+      var grd=ctx.createRadialGradient(b.x*w,b.y*h,0,b.x*w,b.y*h,b.r*Math.max(w,h));
+      grd.addColorStop(0,b.color);grd.addColorStop(1,'transparent');
+      ctx.globalCompositeOperation='lighter';
+      ctx.fillStyle=grd;ctx.fillRect(0,0,w,h);
+      ctx.globalCompositeOperation='source-over';
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   KINETIC MARQUEE — trust bar
+   ══════════════════════════════════════════════════════════════ */
+(function(){
+  document.querySelectorAll('.marquee-row').forEach(function(row){
+    var content=row.querySelector('.marquee-content');
+    var clone=content.cloneNode(true);
+    row.appendChild(clone);
+  });
+  if(typeof gsap!=='undefined'&&gsap.registerPlugin){gsap.registerPlugin(ScrollTrigger);}
+  var rows=document.querySelectorAll('.marquee-row');
+  var baseSpeed=60;
+  var scrollVelocity=0;
+  if(typeof ScrollTrigger!=='undefined'){
+    ScrollTrigger.create({onUpdate:function(self){scrollVelocity=Math.abs(self.getVelocity());}});
+  }
+  rows.forEach(function(row){
+    var content=row.querySelector('.marquee-content');
+    var direction=row.dataset.direction==='right'?1:-1;
+    var speedMult=parseFloat(row.dataset.speed)||1;
+    var contentWidth=content.offsetWidth;
+    var x=direction===-1?0:-contentWidth;
+    function animate(){
+      var speed=(baseSpeed+scrollVelocity*0.12)*speedMult;
+      x+=direction*-1*speed/60;
+      if(direction===-1&&x<=-contentWidth)x+=contentWidth;
+      if(direction===1&&x>=0)x-=contentWidth;
+      row.style.transform='translateX('+x+'px)';
+      requestAnimationFrame(animate);
+    }
+    animate();
+  });
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   SPOTLIGHT SERVICE CARDS
+   ══════════════════════════════════════════════════════════════ */
+(function(){
+  var grid=document.getElementById('spotGrid');
+  grid.addEventListener('mousemove',function(e){
+    grid.querySelectorAll('.spot-card').forEach(function(c){
+      var r=c.getBoundingClientRect();
+      c.style.setProperty('--mx',(e.clientX-r.left)+'px');
+      c.style.setProperty('--my',(e.clientY-r.top)+'px');
+    });
+  });
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   ODOMETER COUNTERS
+   ══════════════════════════════════════════════════════════════ */
+(function(){
+  if(typeof gsap==='undefined'){return;}
+  gsap.registerPlugin(ScrollTrigger);
+  document.querySelectorAll('.odometer').forEach(function(odo){
+    var val=odo.dataset.value;var suffix=odo.dataset.suffix||'';
+    var digits=val.split('');
+    odo.innerHTML='';
+    digits.forEach(function(d){
+      var digit=document.createElement('div');digit.className='odo-digit';
+      var strip=document.createElement('div');strip.className='odo-strip';
+      for(var i=0;i<=9;i++){var s=document.createElement('span');s.textContent=i;strip.appendChild(s);}
+      digit.appendChild(strip);odo.appendChild(digit);
+    });
+    if(suffix){var s=document.createElement('span');s.className='stat-suffix';s.textContent=suffix;odo.appendChild(s);}
+    ScrollTrigger.create({trigger:odo,start:'top 85%',once:true,onEnter:function(){
+      var strips=odo.querySelectorAll('.odo-strip');
+      strips.forEach(function(strip,i){
+        var target=parseInt(digits[i]);
+        var h=strip.children[0].offsetHeight;
+        strip.style.transform='translateY(-'+(target*h)+'px)';
+        strip.style.transitionDelay=(i*0.1)+'s';
+      });
+    }});
+  });
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   PARTICLE EXPLOSION BUTTONS
+   ══════════════════════════════════════════════════════════════ */
+(function(){
+  document.querySelectorAll('.explode-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var rect=btn.getBoundingClientRect();
+      var cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
+      var type=btn.dataset.type,color=btn.dataset.color;
+      if(type==='particles')spawnParticles(cx,cy,color);
+      else if(type==='ring')spawnRing(cx,cy,color);
+    });
+  });
+  function spawnParticles(cx,cy,color){
+    for(var i=0;i<20;i++){
+      var p=document.createElement('div');p.className='particle';
+      p.style.background=color;p.style.left=cx+'px';p.style.top=cy+'px';
+      document.body.appendChild(p);
+      var angle=Math.random()*Math.PI*2,dist=40+Math.random()*80;
+      var dx=Math.cos(angle)*dist,dy=Math.sin(angle)*dist-40;
+      p.style.transition='all .6s cubic-bezier(.16,1,.3,1)';
+      p.offsetHeight;
+      p.style.transform='translate('+dx+'px,'+dy+'px) scale(0)';
+      p.style.opacity='0';
+      setTimeout(function(el){el.remove();},700,p);
+    }
+  }
+  function spawnRing(cx,cy,color){
+    var r=document.createElement('div');
+    r.style.cssText='position:fixed;border-radius:50%;pointer-events:none;z-index:9998;border:2px solid '+color+';opacity:0;';
+    r.style.left=cx+'px';r.style.top=cy+'px';r.style.width='10px';r.style.height='10px';r.style.marginLeft='-5px';r.style.marginTop='-5px';
+    document.body.appendChild(r);
+    r.style.transition='all .5s cubic-bezier(.16,1,.3,1)';
+    r.offsetHeight;
+    r.style.width='120px';r.style.height='120px';r.style.marginLeft='-60px';r.style.marginTop='-60px';r.style.opacity='1';
+    setTimeout(function(){r.style.opacity='0';},200);
+    setTimeout(function(){r.remove();},600);
+  }
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   FAQ ACCORDION
+   ══════════════════════════════════════════════════════════════ */
+(function(){
+  document.querySelectorAll('#faqList .faq-q').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var item=btn.closest('.faq-item');
+      var answer=item.querySelector('.faq-a');
+      var isOpen=btn.classList.contains('open');
+      document.querySelectorAll('#faqList .faq-q').forEach(function(b){b.classList.remove('open');b.nextElementSibling.style.maxHeight=null;});
+      if(!isOpen){btn.classList.add('open');answer.style.maxHeight=answer.scrollHeight+'px';}
+    });
+  });
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   ZIP LOOKUP (demo)
+   ══════════════════════════════════════════════════════════════ */
+function handleZipLookup(e){
+  e.preventDefault();
+  var zip=document.getElementById('zipInput').value.trim();
+  var result=document.getElementById('zipResult');
+  if(!/^\d{5}$/.test(zip)){result.innerHTML='Please enter a valid 5-digit ZIP code.';return false;}
+  var shops=['North Myrtle Beach, SC','Myrtle Beach, SC','Conway, SC'];
+  result.innerHTML='Nearest shops to <strong>'+zip+'</strong>: '+shops.join(' · ')+' <span style="color:var(--muted-2)">(demo lookup — production version uses live geolocation against all 60+ shops)</span>';
+  return false;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BOOKING FORM (demo submit)
+   ══════════════════════════════════════════════════════════════ */
+function handleBookSubmit(e){
+  e.preventDefault();
+  document.getElementById('bookForm').style.display='none';
+  document.getElementById('cfSuccess').classList.add('active');
+  return false;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CHATBOT — REV
+   ══════════════════════════════════════════════════════════════
+   Everything below runs client-side for this demo. In production:
+   - FAQ_KB matching → replaced/augmented by a real LLM (Claude) call
+   - booking confirm step → POST to Cal.com /v1/bookings (or similar) using CAL_COM_API_KEY
+   - "Talk to REV by Phone" → real number wired to an ElevenLabs
+     Conversational AI agent via Twilio, sharing this same FAQ_KB
+     and booking state machine as tools the voice agent can call.
+   ══════════════════════════════════════════════════════════════ */
+var chatBody=document.getElementById('chatBody');
+var chatOpen=false;
+var booking={active:false,step:0,service:null,location:null,slot:null,name:null,phone:null};
+
+var FAQ_KB=[
+  {kw:['hour','open','close','time'],a:"We're open Monday–Friday 7:30am–6pm and Saturday 8am–4pm, closed Sunday. Roadside dispatch runs 24/7 every day of the year."},
+  {kw:['price','cost','how much','pricing'],a:"Pricing depends on your vehicle and tire size, but most oil changes run $40–$90 and tire installs vary by brand. Want me to get you an exact quote from a team member?"},
+  {kw:['brand','tire brand','michelin','goodyear','dunlop'],a:"We carry Goodyear, Michelin, Cooper, Continental, Kelly, Hankook, BFGoodrich, and Dunlop — across every budget tier."},
+  {kw:['location','where','address','near me','zip'],a:"We've got 60+ shops across North Carolina and South Carolina. Tell me your city or ZIP and I'll point you to the closest one."},
+  {kw:['warranty','guarantee'],a:"Most tires come with the manufacturer's tread-life warranty, and our labor is guaranteed for 12 months / 12,000 miles. A team member can confirm specifics for your tire choice."},
+  {kw:['commercial','fleet','wholesale','business'],a:"Yes! We run dedicated fleet accounts with volume pricing, a named account manager, and on-site or mobile service for qualifying fleets. Want me to connect you with our commercial team?"},
+  {kw:['roadside','flat','stranded','tow','breakdown'],a:"If you're stranded right now, call our 24/7 roadside line directly at (843) 555-0187 — that's the fastest path. I can also note your issue here if you'd rather text it over."},
+  {kw:['inspection','emission','fluid check'],a:"We do free fluid inspections (oil, coolant, transmission, brake fluid) as part of routine maintenance at every location."},
+  {kw:['financing','payment plan'],a:"We work with a couple of third-party financing partners for larger tire or repair jobs — a team member can walk you through the options at your appointment."},
+  {kw:['human','person','representative','agent','talk to someone'],a:"Of course — you can call us anytime at (843) 555-0187, or I can pass your details to a team member right now. Want me to do that?"}
+];
+
+function findFaqAnswer(text){
+  var lower=text.toLowerCase();
+  for(var i=0;i<FAQ_KB.length;i++){
+    for(var j=0;j<FAQ_KB[i].kw.length;j++){
+      if(lower.indexOf(FAQ_KB[i].kw[j])!==-1) return FAQ_KB[i].a;
+    }
+  }
+  return null;
+}
+
+function addMsg(text,who){
+  var el=document.createElement('div');
+  el.className='msg '+who;
+  el.innerHTML=text;
+  chatBody.appendChild(el);
+  chatBody.scrollTop=chatBody.scrollHeight;
+  return el;
+}
+function addChips(chips){
+  var wrap=document.createElement('div');
+  wrap.className='msg-chips';
+  chips.forEach(function(c){
+    var b=document.createElement('button');
+    b.className='chip'+(c.accent?' chip-accent':'');
+    b.textContent=c.label;
+    b.onclick=c.onClick;
+    wrap.appendChild(b);
+  });
+  chatBody.appendChild(wrap);
+  chatBody.scrollTop=chatBody.scrollHeight;
+}
+function showTyping(cb,delay){
+  var t=document.createElement('div');
+  t.className='typing';
+  t.innerHTML='<span></span><span></span><span></span>';
+  chatBody.appendChild(t);
+  chatBody.scrollTop=chatBody.scrollHeight;
+  setTimeout(function(){t.remove();cb&&cb();},delay||900);
+}
+
+function toggleChat(){
+  chatOpen=!chatOpen;
+  document.getElementById('chatPanel').classList.toggle('open',chatOpen);
+  if(chatOpen && chatBody.children.length===0){
+    showTyping(function(){
+      addMsg("Hey, I'm <strong>REV</strong> — an AI service advisor concept built for Black's Tire and Auto Service. I can book your appointment, answer questions about service or pricing, or connect you by phone. What do you need today?",'bot');
+      addChips([
+        {label:'📅 Book an appointment',accent:true,onClick:startBookingFlow},
+        {label:'❓ Ask a question',onClick:function(){addMsg('Ask a question','user');showTyping(function(){addMsg("Go ahead — type your question below, or try one of these:",'bot');addChips([
+          {label:'What are your hours?',onClick:function(){quickAsk('What are your hours?');}},
+          {label:'Which tire brands?',onClick:function(){quickAsk('Which tire brands do you carry?');}},
+          {label:'Do you service fleets?',onClick:function(){quickAsk('Do you service commercial fleets?');}}
+        ]);});});},
+        {label:'📞 Talk to REV by phone',onClick:startCallDemo}
+      ]);
+    },700);
+  }
+}
+function openChat(){ if(!chatOpen) toggleChat(); }
+function quickAsk(q){
+  addMsg(q,'user');
+  showTyping(function(){
+    var ans=findFaqAnswer(q)||"That's a great question — let me connect you with a team member who can give you the exact answer. Want me to take your name and number?";
+    addMsg(ans,'bot');
+  });
+}
+
+function sendChat(){
+  var input=document.getElementById('chatInput');
+  var text=input.value.trim();
+  if(!text)return;
+  input.value='';
+  addMsg(text,'user');
+
+  if(booking.active){ handleBookingInput(text); return; }
+
+  showTyping(function(){
+    var ans=findFaqAnswer(text);
+    if(ans){
+      addMsg(ans,'bot');
+    }else{
+      addMsg("I want to make sure you get the right answer — I can pass this to a team member, or you're welcome to call (843) 555-0187 directly. Want to book an appointment instead?",'bot');
+      addChips([{label:'📅 Book an appointment',accent:true,onClick:startBookingFlow}]);
+    }
+  },800);
+}
+
+/* ── Booking flow state machine ── */
+var SERVICES=['Tires & Wheels','Brake Repair & Replacement','Fluid Inspection','Wheel Alignments','Engine Diagnostics','Batteries','Commercial / Fleet'];
+var LOCATIONS=['North Myrtle Beach, SC','Myrtle Beach, SC','Surfside Beach, SC','Conway, SC','Pawleys Island, SC','Georgetown, SC'];
+
+function startBookingFlow(){
+  openChat();
+  booking={active:true,step:1,service:null,location:null,slot:null,name:null,phone:null};
+  showTyping(function(){
+    addMsg("Happy to get you booked. First — what service do you need?",'bot');
+    addChips(SERVICES.map(function(s){return {label:s,onClick:function(){pickService(s);}};}));
+  },700);
+}
+function pickService(s){
+  booking.service=s; addMsg(s,'user'); booking.step=2;
+  showTyping(function(){
+    addMsg('Which location works best for you?','bot');
+    addChips(LOCATIONS.map(function(l){return {label:l,onClick:function(){pickLocation(l);}};}));
+  });
+}
+function pickLocation(l){
+  booking.location=l; addMsg(l,'user'); booking.step=3;
+  showTyping(function(){
+    addMsg('Here are the next available slots:','bot');
+    var days=nextWeekdays(2);
+    var chips=[];
+    days.forEach(function(d){
+      ['9:00 AM','11:30 AM','2:00 PM'].forEach(function(t){
+        chips.push({label:d+' · '+t,onClick:function(){pickSlot(d+' at '+t);}});
+      });
+    });
+    addChips(chips);
+  });
+}
+function nextWeekdays(count){
+  var out=[],d=new Date(),added=0;
+  while(added<count){
+    d.setDate(d.getDate()+1);
+    if(d.getDay()!==0){ out.push(d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})); added++; }
+  }
+  return out;
+}
+function pickSlot(s){
+  booking.slot=s; addMsg(s,'user'); booking.step=4;
+  showTyping(function(){
+    addMsg("Last step — what's your name and phone number? (e.g. \"Jamie Rivera, 843-555-0199\")",'bot');
+  });
+}
+function handleBookingInput(text){
+  if(booking.step===4){
+    booking.name=text; booking.step=5;
+    showTyping(function(){
+      confirmBooking();
+    });
+  }else{
+    showTyping(function(){
+      addMsg('Just tap one of the options above to keep things moving — or type "cancel" to stop booking.','bot');
+    },500);
+    if(text.toLowerCase().indexOf('cancel')!==-1){ booking.active=false; }
+  }
+}
+function confirmBooking(){
+  var conf='BTS-'+Math.floor(10000+Math.random()*89999);
+  addMsg(
+    "<strong>You're booked!</strong><br>"+
+    booking.service+' at '+booking.location+'<br>'+
+    booking.slot+'<br>'+
+    'Confirmation #'+conf+
+    '<br><br><span style="color:var(--muted);font-size:12px">Demo booking — in production this writes directly to Cal.com and syncs to the shop\'s calendar.</span>',
+    'bot'
+  );
+  booking.active=false;
+}
+
+/* ── Voice call demo ── */
+var CALL_SCRIPT=[
+  {who:'REV',text:"Thanks for calling Black's Tire and Auto Service, this is REV — how can I help today?"},
+  {who:'Caller',text:"Hey, I've got a slow leak in my front driver tire, can I get that looked at today?"},
+  {who:'REV',text:"Absolutely. I can get you into our North Myrtle Beach shop at 2:00 PM today — we'll patch it if it's repairable or get you a same-brand replacement if not."},
+  {who:'Caller',text:"That works. Can you text me the confirmation?"},
+  {who:'REV',text:"Done — you're booked for 2:00 PM, confirmation BTS-48213, and a text is on its way now. Anything else?"},
+  {who:'Caller',text:"Nope, that's it. Thanks!"},
+  {who:'REV',text:"You're all set — see you at 2:00. Drive safe!"}
+];
+function startCallDemo(){
+  var overlay=document.getElementById('callOverlay');
+  var icon=document.getElementById('callIcon');
+  var status=document.getElementById('callStatus');
+  var sub=document.getElementById('callSub');
+  var transcript=document.getElementById('callTranscript');
+  transcript.innerHTML='';
+  icon.classList.add('dialing');
+  status.textContent='Dialing REV AI Line…';
+  sub.textContent='(843) 555-0187 · Demo Voice Preview';
+  overlay.classList.add('open');
+
+  setTimeout(function(){
+    icon.classList.remove('dialing');
+    status.textContent='Connected';
+    sub.textContent='Live transcript (demo)';
+    playCallScript(0);
+  },1600);
+}
+function playCallScript(i){
+  var transcript=document.getElementById('callTranscript');
+  if(!document.getElementById('callOverlay').classList.contains('open'))return;
+  if(i>=CALL_SCRIPT.length){
+    var end=document.createElement('div');
+    end.className='call-line';
+    end.style.color='var(--muted-2)';
+    end.textContent='— call ended —';
+    transcript.appendChild(end);
+    transcript.scrollTop=transcript.scrollHeight;
+    return;
+  }
+  var line=CALL_SCRIPT[i];
+  var el=document.createElement('div');
+  el.className='call-line';
+  el.innerHTML='<b>'+line.who+':</b> '+line.text;
+  transcript.appendChild(el);
+  transcript.scrollTop=transcript.scrollHeight;
+  setTimeout(function(){playCallScript(i+1);},1500);
+}
+function endCallDemo(){
+  document.getElementById('callOverlay').classList.remove('open');
+}
+</script>
+</body>
+</html>

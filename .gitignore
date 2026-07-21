@@ -7,3 +7,5 @@ _verify_*.png
 
 # Locally-installed skill packages (tooling, not site deliverable)
 .agents/
+
+video-source/

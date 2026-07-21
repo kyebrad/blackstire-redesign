@@ -39,6 +39,7 @@ body{
   overflow-x:hidden;
   line-height:1.6;
   -webkit-font-smoothing:antialiased;
+  transition:background 1s ease;
 }
 img{max-width:100%;display:block}
 a{color:inherit}
@@ -546,7 +547,7 @@ h1,h2,h3{font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:-.01em
 </section>
 
 <!-- ══════════════════════════ SERVICES ══════════════════════════ -->
-<section class="services-section" id="services">
+<section class="services-section" id="services" data-scene-bg="#0a0b0d">
   <div class="section-head layer fade-up">
     <div>
       <div class="eyebrow">What We Do</div>
@@ -639,7 +640,7 @@ h1,h2,h3{font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:-.01em
 </section>
 
 <!-- ══════════════════════════ STATS ══════════════════════════ -->
-<section class="stats-section">
+<section class="stats-section" data-scene-bg="#090d14">
   <canvas id="meshCanvas"></canvas>
   <div class="stats-inner">
     <div class="section-head fade-up" style="margin-bottom:0">
@@ -659,7 +660,7 @@ h1,h2,h3{font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:-.01em
 </section>
 
 <!-- ══════════════════════════ COMMERCIAL SPLIT ══════════════════════════ -->
-<section class="split-section" id="commercial">
+<section class="split-section" id="commercial" data-scene-bg="#120d07">
   <div class="section-head layer fade-up">
     <div>
       <div class="eyebrow">Retail + Commercial</div>
@@ -693,7 +694,7 @@ h1,h2,h3{font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:-.01em
 </section>
 
 <!-- ══════════════════════════ LOCATIONS ══════════════════════════ -->
-<section class="locations-section" id="locations">
+<section class="locations-section" id="locations" data-scene-bg="#0a0b0d">
   <div class="loc-inner">
     <div class="section-head fade-up">
       <div>
@@ -870,20 +871,21 @@ h1,h2,h3{font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:-.01em
       <div class="cf-title">Request an Appointment</div>
       <form id="bookForm" onsubmit="return handleBookSubmit(event)">
         <div class="cf-row">
-          <div class="cf-field"><label>First Name</label><input type="text" required /></div>
-          <div class="cf-field"><label>Last Name</label><input type="text" required /></div>
+          <div class="cf-field"><label>First Name</label><input type="text" name="firstName" required /></div>
+          <div class="cf-field"><label>Last Name</label><input type="text" name="lastName" required /></div>
         </div>
         <div class="cf-row">
-          <div class="cf-field"><label>Phone</label><input type="tel" required /></div>
+          <div class="cf-field"><label>Phone</label><input type="tel" name="phone" required /></div>
           <div class="cf-field"><label>Preferred Location</label>
-            <select><option>North Myrtle Beach, SC</option><option>Myrtle Beach, SC</option><option>Surfside Beach, SC</option><option>Conway, SC</option><option>Pawleys Island, SC</option><option>Georgetown, SC</option><option>Shallotte, NC</option><option>Calabash, NC</option><option>Wilmington, NC</option></select>
+            <select name="location"><option>North Myrtle Beach, SC</option><option>Myrtle Beach, SC</option><option>Surfside Beach, SC</option><option>Conway, SC</option><option>Pawleys Island, SC</option><option>Georgetown, SC</option><option>Shallotte, NC</option><option>Calabash, NC</option><option>Wilmington, NC</option></select>
           </div>
         </div>
         <div class="cf-field"><label>Service Needed</label>
-          <select><option>Tires &amp; Wheels</option><option>Brake Repair &amp; Replacement</option><option>Fluid Inspection</option><option>Wheel Alignments</option><option>Engine Diagnostics</option><option>Batteries</option><option>Commercial / Fleet</option><option>Not Sure — Just Diagnose It</option></select>
+          <select name="service"><option>Tires &amp; Wheels</option><option>Brake Repair &amp; Replacement</option><option>Fluid Inspection</option><option>Wheel Alignments</option><option>Engine Diagnostics</option><option>Batteries</option><option>Commercial / Fleet</option><option>Not Sure — Just Diagnose It</option></select>
         </div>
-        <div class="cf-field"><label>Anything else we should know?</label><textarea placeholder="Tell us about the issue, or your vehicle's year/make/model"></textarea></div>
-        <button type="submit" class="btn btn-primary cf-submit explode-btn" data-type="ring" data-color="#ffb020">Request Appointment</button>
+        <div class="cf-field"><label>Anything else we should know?</label><textarea name="notes" placeholder="Tell us about the issue, or your vehicle's year/make/model"></textarea></div>
+        <button type="submit" class="btn btn-primary cf-submit explode-btn" data-type="ring" data-color="#ffb020" id="bookSubmitBtn">Request Appointment</button>
+        <div id="bookFormError" style="display:none;color:#ff6b6b;font-size:12.5px;margin-top:12px;text-align:center"></div>
       </form>
       <div class="cf-success" id="cfSuccess">
         <div style="width:56px;height:56px;border-radius:50%;border:2px solid var(--amber);margin:0 auto 18px;display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" stroke="#ffb020" fill="none" stroke-width="2" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg></div>
@@ -1010,6 +1012,24 @@ h1,h2,h3{font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:-.01em
     entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); } });
   },{threshold:.15});
   els.forEach(function(el){obs.observe(el)});
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   SCROLL COLOR SHIFT — Cinematic Module 09 (adapted: subtle body-bg
+   tint per section, staying inside the navy/gold palette rather than
+   the module's original hue-jumping demo — restrained per the
+   high-end-visual-design taste skill)
+   ══════════════════════════════════════════════════════════════ */
+(function(){
+  if(typeof gsap==='undefined'){return;}
+  gsap.registerPlugin(ScrollTrigger);
+  document.querySelectorAll('[data-scene-bg]').forEach(function(s){
+    ScrollTrigger.create({
+      trigger:s,start:'top 60%',end:'bottom 40%',
+      onEnter:function(){document.body.style.background=s.dataset.sceneBg;},
+      onEnterBack:function(){document.body.style.background=s.dataset.sceneBg;}
+    });
+  });
 })();
 
 /* ══════════════════════════════════════════════════════════════
@@ -1414,8 +1434,32 @@ function handleZipLookup(e){
    ══════════════════════════════════════════════════════════════ */
 function handleBookSubmit(e){
   e.preventDefault();
-  document.getElementById('bookForm').style.display='none';
-  document.getElementById('cfSuccess').classList.add('active');
+  var form=document.getElementById('bookForm');
+  var btn=document.getElementById('bookSubmitBtn');
+  var errEl=document.getElementById('bookFormError');
+  errEl.style.display='none';
+  var data=Object.fromEntries(new FormData(form).entries());
+  btn.disabled=true;
+  var originalLabel=btn.textContent;
+  btn.textContent='Submitting…';
+  fetch('/api/booking-submit',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(data)
+  }).then(function(res){
+    if(!res.ok) return res.json().then(function(b){throw new Error(b.error||'Request failed');});
+    return res.json();
+  }).then(function(result){
+    form.style.display='none';
+    var success=document.getElementById('cfSuccess');
+    success.querySelector('p').innerHTML=result.message+' <strong>Confirmation #'+result.confirmation+'</strong>';
+    success.classList.add('active');
+  }).catch(function(err){
+    errEl.textContent='Something went wrong submitting your request ('+err.message+'). Please call (843) 555-0187 or try REV in the chat widget instead.';
+    errEl.style.display='block';
+    btn.disabled=false;
+    btn.textContent=originalLabel;
+  });
   return false;
 }
 

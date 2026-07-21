@@ -4,3 +4,6 @@ _verify_*.png
 
 # Local Netlify folder
 .netlify
+
+# Locally-installed skill packages (tooling, not site deliverable)
+.agents/

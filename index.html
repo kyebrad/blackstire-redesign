@@ -337,6 +337,12 @@ h1,h2,h3{font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:-.01em
 .call-transcript{background:var(--asphalt);border:1px solid var(--border);border-radius:14px;padding:16px;height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
 .call-line{font-size:12.5px;line-height:1.55;animation:msgin .3s ease}
 .call-line b{color:var(--amber)}
+.call-mic-row{display:flex;gap:8px;margin-bottom:14px}
+.call-mic-row input{flex:1;background:var(--asphalt);border:1px solid var(--border-2);border-radius:100px;padding:10px 16px;color:var(--text);font-size:13px;font-family:'Archivo',sans-serif;outline:none}
+.call-mic-row input:focus{border-color:var(--amber)}
+.call-mic-row .chat-send{width:38px;height:38px}
+.call-listening{display:inline-flex;align-items:center;gap:6px;color:var(--cyan);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.call-listening .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);animation:pulse 1s ease infinite}
 .call-hangup{width:100%;background:#0e2a4a;color:#fff;border:none;border-radius:100px;padding:13px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:8px}
 .call-hangup:hover{background:#0a1f38}
 .call-note{font-size:10.5px;color:var(--muted-2);text-align:center;margin-top:14px;line-height:1.6}
@@ -369,6 +375,24 @@ h1,h2,h3{font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:-.01em
   .chat-panel{right:16px;bottom:90px;width:calc(100vw - 32px)}
   .chat-launcher{right:16px;bottom:16px}
 }
+
+/* ══════════════════════════ CURTAIN REVEAL (Cinematic Module 07) ══════════════════════════ */
+.curtain-section{position:relative;height:220vh}
+.curtain-sticky{position:sticky;top:0;height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.curtain-left,.curtain-right{position:absolute;top:0;bottom:0;width:50%;background:var(--asphalt);z-index:3;display:flex;align-items:center;overflow:hidden}
+.curtain-left{left:0;justify-content:flex-end;padding-right:6vw;border-right:1px solid var(--border)}
+.curtain-right{right:0;justify-content:flex-start;padding-left:6vw;border-left:1px solid var(--border)}
+.curtain-left h2,.curtain-right h2{font-family:'Rajdhani',sans-serif;font-size:clamp(40px,9vw,120px);font-weight:700;letter-spacing:-.02em;line-height:.9;text-transform:uppercase;white-space:nowrap}
+.curtain-content{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:radial-gradient(ellipse 70% 60% at 50% 45%,rgba(14,42,74,.5) 0%,var(--asphalt) 70%);padding:40px}
+.curtain-content .eyebrow{justify-content:center}
+.curtain-content h3{font-family:'Rajdhani',sans-serif;font-size:clamp(26px,4.4vw,52px);font-weight:700;letter-spacing:-.01em;text-transform:uppercase;margin-bottom:14px;color:var(--text)}
+.curtain-content p{font-size:15px;color:var(--muted);max-width:44ch;line-height:1.7;margin-bottom:8px}
+.curtain-hint{position:absolute;bottom:36px;left:50%;transform:translateX(-50%);z-index:2;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted-2)}
+@media (max-width:720px){
+  .curtain-left h2,.curtain-right h2{font-size:clamp(28px,12vw,64px)}
+  .curtain-left{padding-right:3vw}
+  .curtain-right{padding-left:3vw}
+}
 </style>
 </head>
 <body>
@@ -400,6 +424,20 @@ h1,h2,h3{font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:-.01em
   <a href="#contact">Contact</a>
   <a href="tel:+18435550187">(843) 555-0187</a>
 </div>
+
+<!-- ══════════════════════════ CURTAIN REVEAL — Cinematic Module 07 ══════════════════════════ -->
+<section class="curtain-section">
+  <div class="curtain-sticky">
+    <div class="curtain-content">
+      <div class="eyebrow">Since Day One</div>
+      <h3>60+ Shops. One Standard.</h3>
+      <p>Scroll to open the doors.</p>
+    </div>
+    <div class="curtain-left" id="cLeft"><h2>BLACK'S</h2></div>
+    <div class="curtain-right" id="cRight"><h2>TIRE</h2></div>
+    <div class="curtain-hint">Keep Scrolling ↓</div>
+  </div>
+</section>
 
 <!-- ══════════════════════════ HERO ══════════════════════════ -->
 <header class="hero" id="top">
@@ -773,17 +811,21 @@ h1,h2,h3{font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:-.01em
   <div class="chat-footnote">Demo assistant · booking &amp; FAQ logic run locally · connects to Cal.com + ElevenLabs in production</div>
 </div>
 
-<!-- ══════════════════════════ VOICE CALL DEMO MODAL ══════════════════════════ -->
+<!-- ══════════════════════════ LIVE VOICE CALL — REV ══════════════════════════ -->
 <div class="call-overlay" id="callOverlay">
   <div class="call-card">
     <div class="call-phone-icon dialing" id="callIcon">
       <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
     </div>
-    <div class="call-status" id="callStatus">Dialing REV AI Line…</div>
-    <div class="call-sub" id="callSub">(843) 555-0187 · Demo Voice Preview</div>
+    <div class="call-status" id="callStatus">Connecting…</div>
+    <div class="call-sub" id="callSub">Live voice · your microphone, right in the browser</div>
     <div class="call-transcript" id="callTranscript"></div>
+    <div class="call-mic-row" id="callMicRow" style="display:none">
+      <input type="text" id="callFallbackInput" placeholder="Or type instead of speaking…" onkeydown="if(event.key==='Enter')sendCallText()" />
+      <button class="chat-send" onclick="sendCallText()" aria-label="Send" style="flex-shrink:0"><svg viewBox="0 0 24 24" stroke="#0a0b0d" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
+    </div>
     <button class="call-hangup" onclick="endCallDemo()">Hang Up</button>
-    <div class="call-note">This is a demo of REV's live phone-call capability. In production, this number rings a real ElevenLabs Conversational AI agent over Twilio, sharing the same booking &amp; FAQ logic shown in this chat.</div>
+    <div class="call-note" id="callNote">This is REV's actual voice line — real speech recognition and text-to-speech running in your browser, right now. No phone number required for this demo. A production version would also expose this over a real phone number via Twilio + ElevenLabs Conversational AI, using this same logic as backend tools.</div>
   </div>
 </div>
 
@@ -811,6 +853,19 @@ h1,h2,h3{font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:-.01em
     entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); } });
   },{threshold:.15});
   els.forEach(function(el){obs.observe(el)});
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   CURTAIN REVEAL — Cinematic Module 07 (scroll-scrubbed split)
+   ══════════════════════════════════════════════════════════════ */
+(function(){
+  if(typeof gsap==='undefined'){return;}
+  gsap.registerPlugin(ScrollTrigger);
+  var s=document.querySelector('.curtain-section');
+  if(!s)return;
+  gsap.to('#cLeft',{xPercent:-100,ease:'power2.inOut',scrollTrigger:{trigger:s,start:'top top',end:'75% top',scrub:.5}});
+  gsap.to('#cRight',{xPercent:100,ease:'power2.inOut',scrollTrigger:{trigger:s,start:'top top',end:'75% top',scrub:.5}});
+  gsap.to('.curtain-hint',{opacity:0,scrollTrigger:{trigger:s,start:'top top',end:'15% top',scrub:.5}});
 })();
 
 /* ══════════════════════════════════════════════════════════════
@@ -862,15 +917,14 @@ h1,h2,h3{font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:-.01em
     wheel.rotation.x=0.15;
     scene.add(wheel);
 
+    /* Kept to <=3 lights total per spline-3d-integration performance guidance
+       (ambient + 2 point lights) — cheaper to render, still reads as premium. */
     var ambient=new THREE.AmbientLight(0x40454c,1.1);
     scene.add(ambient);
-    var heatLight=new THREE.PointLight(0x1a4d8f,3.2,20);
+    var heatLight=new THREE.PointLight(0x1a4d8f,3.6,20);
     heatLight.position.set(4,1.5,4);
     scene.add(heatLight);
-    var coolLight=new THREE.PointLight(0x4fd8e8,1.4,20);
-    coolLight.position.set(-4,-2,3);
-    scene.add(coolLight);
-    var rimGlow=new THREE.PointLight(0xffb020,1.8,10);
+    var rimGlow=new THREE.PointLight(0xffb020,2.0,10);
     rimGlow.position.set(0,0,3);
     scene.add(rimGlow);
 
@@ -1280,8 +1334,131 @@ function confirmBooking(){
   booking.active=false;
 }
 
-/* ── Voice call demo ── */
-var CALL_SCRIPT=[
+/* ── Live voice call — REV ──────────────────────────────────────────
+   Real speech recognition (Web Speech API SpeechRecognition) and real
+   text-to-speech (speechSynthesis) running entirely in the browser —
+   an actual voice conversation, not a scripted animation. It reuses
+   findFaqAnswer() from the chat brain above, so REV gives the same
+   answers by voice as it does by text.
+   Falls back to a scripted transcript only on browsers with neither
+   API (older Safari/Firefox). Production would additionally expose
+   this over a real phone number via Twilio + ElevenLabs Conversational
+   AI, calling this same logic as backend tools.
+   ────────────────────────────────────────────────────────────────── */
+var SpeechRec=window.SpeechRecognition||window.webkitSpeechRecognition;
+var hasVoice=!!(SpeechRec&&window.speechSynthesis);
+var callRecognition=null;
+var callActive=false;
+
+var REAL_VOICE_NOTE="This is REV's actual voice line — real speech recognition and text-to-speech running in your browser, right now. No phone number required for this demo. A production version would also expose this over a real phone number via Twilio + ElevenLabs Conversational AI, using this same logic as backend tools.";
+var FALLBACK_NOTE="Your browser doesn't support the Web Speech API (try Chrome or Edge), so here's a scripted preview of what a live call sounds like instead.";
+
+function startCallDemo(){
+  var overlay=document.getElementById('callOverlay');
+  var icon=document.getElementById('callIcon');
+  var status=document.getElementById('callStatus');
+  var sub=document.getElementById('callSub');
+  var transcript=document.getElementById('callTranscript');
+  var micRow=document.getElementById('callMicRow');
+  var note=document.getElementById('callNote');
+  transcript.innerHTML='';
+  icon.classList.add('dialing');
+  status.textContent='Connecting…';
+  overlay.classList.add('open');
+  callActive=true;
+
+  if(hasVoice){
+    sub.textContent='Live voice · your microphone, right in the browser';
+    note.textContent=REAL_VOICE_NOTE;
+    micRow.style.display='flex';
+    setTimeout(function(){
+      icon.classList.remove('dialing');
+      startRealVoiceCall();
+    },1200);
+  }else{
+    sub.textContent='(843) 555-0187 · Scripted preview';
+    note.textContent=FALLBACK_NOTE;
+    micRow.style.display='none';
+    setTimeout(function(){
+      icon.classList.remove('dialing');
+      document.getElementById('callStatus').textContent='Connected';
+      playScriptFallback(0);
+    },1600);
+  }
+}
+
+function addCallLine(who,text){
+  var transcript=document.getElementById('callTranscript');
+  var el=document.createElement('div');
+  el.className='call-line';
+  el.innerHTML='<b>'+who+':</b> '+text;
+  transcript.appendChild(el);
+  transcript.scrollTop=transcript.scrollHeight;
+  return el;
+}
+
+function startRealVoiceCall(){
+  speakAndListen("Thanks for calling Black's Tire and Auto Service, this is REV — how can I help today?");
+}
+
+function speakAndListen(text){
+  addCallLine('REV',text);
+  if(!callActive)return;
+  var utter=new SpeechSynthesisUtterance(text);
+  utter.rate=1.02;
+  var voices=window.speechSynthesis.getVoices();
+  var preferred=voices.find(function(v){return /en/i.test(v.lang);});
+  if(preferred)utter.voice=preferred;
+  utter.onend=function(){ if(callActive) listenForCaller(); };
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utter);
+}
+
+function listenForCaller(){
+  if(!callActive)return;
+  document.getElementById('callStatus').innerHTML='Connected <span class="call-listening"><span class="dot"></span>Listening…</span>';
+  var rec=new SpeechRec();
+  callRecognition=rec;
+  rec.lang='en-US';
+  rec.interimResults=false;
+  rec.maxAlternatives=1;
+  rec.onresult=function(e){
+    var said=e.results[0][0].transcript;
+    handleCallerUtterance(said);
+  };
+  rec.onend=function(){
+    if(callActive) document.getElementById('callStatus').textContent='Connected';
+  };
+  try{ rec.start(); }catch(e){ /* already started / no mic permission — caller can use the text fallback */ }
+}
+
+function handleCallerUtterance(text){
+  if(!callActive)return;
+  if(callRecognition){ try{ callRecognition.abort(); }catch(e){} }
+  addCallLine('You',text);
+  var lower=text.toLowerCase();
+  if(/\b(bye|goodbye|hang up|that.?s all|nothing else)\b/.test(lower)){
+    addCallLine('REV',"Sounds good — thanks for calling Black's Tire and Auto Service. Drive safe!");
+    var finalUtter=new SpeechSynthesisUtterance("Sounds good, thanks for calling Black's Tire and Auto Service. Drive safe!");
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(finalUtter);
+    setTimeout(endCallDemo,3200);
+    return;
+  }
+  var answer=findFaqAnswer(text)||"I want to make sure I get that right — a team member can help directly. Is there anything else I can answer, or would you like me to note that down?";
+  speakAndListen(answer);
+}
+
+function sendCallText(){
+  var input=document.getElementById('callFallbackInput');
+  var text=input.value.trim();
+  if(!text)return;
+  input.value='';
+  handleCallerUtterance(text);
+}
+
+/* Scripted fallback transcript — only used when the browser has no Web Speech API */
+var CALL_SCRIPT_FALLBACK=[
   {who:'REV',text:"Thanks for calling Black's Tire and Auto Service, this is REV — how can I help today?"},
   {who:'Caller',text:"Hey, I've got a slow leak in my front driver tire, can I get that looked at today?"},
   {who:'REV',text:"Absolutely. I can get you into our North Myrtle Beach shop at 2:00 PM today — we'll patch it if it's repairable or get you a same-brand replacement if not."},
@@ -1290,47 +1467,25 @@ var CALL_SCRIPT=[
   {who:'Caller',text:"Nope, that's it. Thanks!"},
   {who:'REV',text:"You're all set — see you at 2:00. Drive safe!"}
 ];
-function startCallDemo(){
-  var overlay=document.getElementById('callOverlay');
-  var icon=document.getElementById('callIcon');
-  var status=document.getElementById('callStatus');
-  var sub=document.getElementById('callSub');
-  var transcript=document.getElementById('callTranscript');
-  transcript.innerHTML='';
-  icon.classList.add('dialing');
-  status.textContent='Dialing REV AI Line…';
-  sub.textContent='(843) 555-0187 · Demo Voice Preview';
-  overlay.classList.add('open');
-
-  setTimeout(function(){
-    icon.classList.remove('dialing');
-    status.textContent='Connected';
-    sub.textContent='Live transcript (demo)';
-    playCallScript(0);
-  },1600);
-}
-function playCallScript(i){
-  var transcript=document.getElementById('callTranscript');
+function playScriptFallback(i){
   if(!document.getElementById('callOverlay').classList.contains('open'))return;
-  if(i>=CALL_SCRIPT.length){
-    var end=document.createElement('div');
-    end.className='call-line';
-    end.style.color='var(--muted-2)';
-    end.textContent='— call ended —';
-    transcript.appendChild(end);
-    transcript.scrollTop=transcript.scrollHeight;
+  if(i>=CALL_SCRIPT_FALLBACK.length){
+    var el=addCallLine('','— call ended —');
+    el.style.color='var(--muted-2)';
+    el.innerHTML='— call ended —';
     return;
   }
-  var line=CALL_SCRIPT[i];
-  var el=document.createElement('div');
-  el.className='call-line';
-  el.innerHTML='<b>'+line.who+':</b> '+line.text;
-  transcript.appendChild(el);
-  transcript.scrollTop=transcript.scrollHeight;
-  setTimeout(function(){playCallScript(i+1);},1500);
+  var line=CALL_SCRIPT_FALLBACK[i];
+  addCallLine(line.who,line.text);
+  setTimeout(function(){playScriptFallback(i+1);},1500);
 }
+
 function endCallDemo(){
+  callActive=false;
   document.getElementById('callOverlay').classList.remove('open');
+  document.getElementById('callMicRow').style.display='none';
+  if(callRecognition){ try{ callRecognition.abort(); }catch(e){} callRecognition=null; }
+  if(window.speechSynthesis){ window.speechSynthesis.cancel(); }
 }
 </script>
 </body>

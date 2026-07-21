@@ -990,6 +990,16 @@ h1,h2,h3{font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:-.01em
 
 <script>
 /* ══════════════════════════════════════════════════════════════
+   FIRST-PARTY ANALYTICS — no cookies, no third-party account
+   ══════════════════════════════════════════════════════════════ */
+(function(){
+  if(navigator.sendBeacon){
+    var payload=new Blob([JSON.stringify({path:location.pathname,referrer:document.referrer})],{type:'application/json'});
+    navigator.sendBeacon('/api/pageview',payload);
+  }
+})();
+
+/* ══════════════════════════════════════════════════════════════
    NAV BEHAVIOR
    ══════════════════════════════════════════════════════════════ */
 (function(){
